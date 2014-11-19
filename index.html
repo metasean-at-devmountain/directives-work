@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Directives Workshop</title>
+	<script type="text/javascript" src="angular.min.js"></script>
+	<script type="text/javascript" src="
+//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.js"></script>
+
+	<script>
+		var app = angular.module('directivesWorkshop', []);
+
+		app.directive('qvColor', function() {
+			return {
+			    restrict: 'AE',
+			    scope: {},
+			    link: function(scope, element, attrs){
+			      console.log(scope, element, attrs);
+			      element.css('color', attrs.qvColor || attrs.color);
+			    }
+			  }
+		});
+
+		app.directive('buttonDelay', function($timeout) {
+			return {
+			    restrict: 'AE',
+			    scope: {},
+			    link: function(scope, element, attrs){
+			      console.log(scope, element, attrs);
+
+			      element.on('click', function() {
+			      	element.text('I have been clicked');
+
+			      	$timeout(function(){
+			      		element.text('my text has been reset!');
+
+			      	}, 2000);
+			      });
+			    }
+			  }
+		});
+
+		app.controller('directivesCtrl', function($scope, $q, $timeout) {
+			$scope.test = "Song Data";
+			$scope.getData = function() {
+				var deferred = $q.defer();
+
+				var data = [
+					{
+						name: 'Here comes the sun',
+						artist: 'The Beatles'
+					}
+				];
+
+				$timeout(function(){  // faking a network call
+					deferred.resolve(data);
+					$scope.songData = data;
+				}, 250);
+
+				return deferred.promise;
+			};
+		});
+
+		app.directive('songsList', function($timeout) {
+			return {
+			    restrict: 'AE',
+			    scope: {        // isolate scope
+			    	              // creates a NEW scope
+			   // 	request: "@request", // single-bind
+			    	items: "=" // double-bind
+			    },
+			    template: "<ul><li ng-repeat='item in items'>{{item}}</li></ul>",
+			    link: function(scope, element, attrs){
+			      console.log(scope, element, attrs);
+
+			      element.on('click', function() {
+			      	scope.request;
+
+			      });
+			    }
+			  }
+		});
+
+	</script>
+</head>
+
+
+<body ng-app="directivesWorkshop">
+	<h3>Directives Workshop</h3>
+
+<!--
+ 	<div id="name" qv-color="blue">
+		This text should be blue.
+	</div>
+
+	<qv-color color="red">This text should be red.</qv-color> 
+
+	<button button-delay>This is a button</button> -->
+
+	<div ng-controller="directivesCtrl">
+
+		{{test}} <br />
+
+		<button ng-click="getData()">This is a button</button>
+
+		<div songs-list items="songs">
+
+		</div>
+<!-- 		<ul>
+			<li ng-repeat="song in songs">
+				{{ song.name }} by {{ song.artist }}
+			</li>
+		</ul> -->
+	</div>
+
+</body>
+</html>
